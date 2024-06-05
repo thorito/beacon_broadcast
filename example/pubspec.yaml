@@ -1,5 +1,6 @@
 name: beacon_broadcast_example
 description: Demonstrates how to use the beacon_broadcast plugin.
+version: 0.3.2
 publish_to: 'none'
 
 environment:
