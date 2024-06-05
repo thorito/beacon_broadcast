@@ -1,5 +1,31 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="pl.pszklarska.beacon_broadcast_example">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission
+        android:minSdkVersion="29"
+        android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-permission
+        android:minSdkVersion="31"
+        android:name="android.permission.BLUETOOTH_ADVERTISE"
+        tools:ignore="SystemPermissionTypo" />
+    <uses-permission
+        android:minSdkVersion="31"
+        android:name="android.permission.BLUETOOTH_CONNECT"
+        tools:ignore="SystemPermissionTypo" />
+    <uses-permission
+        android:minSdkVersion="31"
+        android:name="android.permission.BLUETOOTH_SCAN"
+        tools:ignore="SystemPermissionTypo" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application
         android:icon="@mipmap/ic_launcher"

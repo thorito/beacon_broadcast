@@ -24,8 +24,8 @@ class _MyAppState extends State<MyApp> {
   BeaconBroadcast beaconBroadcast = BeaconBroadcast();
 
   bool _isAdvertising = false;
-  BeaconStatus _isTransmissionSupported;
-  StreamSubscription<bool> _isAdvertisingSubscription;
+  BeaconStatus? _isTransmissionSupported;
+  StreamSubscription<bool>? _isAdvertisingSubscription;
 
   @override
   void initState() {
@@ -62,14 +62,14 @@ class _MyAppState extends State<MyApp> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text('Is transmission supported?',
-                    style: Theme.of(context).textTheme.headline5),
+                    style: Theme.of(context).textTheme.bodyMedium),
                 Text('$_isTransmissionSupported',
-                    style: Theme.of(context).textTheme.subtitle1),
+                    style: Theme.of(context).textTheme.bodySmall),
                 Container(height: 16.0),
                 Text('Has beacon started?',
-                    style: Theme.of(context).textTheme.headline5),
+                    style: Theme.of(context).textTheme.bodyMedium),
                 Text('$_isAdvertising',
-                    style: Theme.of(context).textTheme.subtitle1),
+                    style: Theme.of(context).textTheme.bodySmall),
                 Container(height: 16.0),
                 Center(
                   child: ElevatedButton(
@@ -98,7 +98,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ),
                 Text('Beacon Data',
-                    style: Theme.of(context).textTheme.headline5),
+                    style: Theme.of(context).textTheme.bodySmall),
                 Text('UUID: $uuid'),
                 Text('Major id: $majorId'),
                 Text('Minor id: $minorId'),
