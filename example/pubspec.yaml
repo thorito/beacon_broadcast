@@ -1,10 +1,10 @@
 name: beacon_broadcast_example
 description: Demonstrates how to use the beacon_broadcast plugin.
-version: 0.3.2
+version: 0.3.3
 publish_to: 'none'
 
 environment:
-  sdk: '>=3.3.4 <4.0.0'
+  sdk: '>=3.3.5 <4.0.0'
 
 dependencies:
   flutter:
