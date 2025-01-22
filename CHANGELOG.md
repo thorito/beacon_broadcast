@@ -1,3 +1,6 @@
+## 0.3.3
+Updated dependencies
+
 ## 0.3.1
 
 Added support for android apps targetting SDK 31 and above
