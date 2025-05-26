@@ -1,4 +1,9 @@
+## 0.3.4
+
+Fix iOS UUID
+
 ## 0.3.3
+
 Updated dependencies
 
 ## 0.3.1

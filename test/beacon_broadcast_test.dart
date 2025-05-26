@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:beacon_broadcast/beacon_broadcast.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';

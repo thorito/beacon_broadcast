@@ -18,13 +18,24 @@ class Beacon : NSObject, CBPeripheralManagerDelegate {
     var shouldStartAdvertise: Bool = false
     
     func start(beaconData: BeaconData) {
-        let proximityUUID = UUID(uuidString: beaconData.uuid)
+        guard let proximityUUID = UUID(uuidString: beaconData.uuid) else {
+            print("Error: UUID invalid - \(beaconData.uuid)")
+            return
+        }
         let major : CLBeaconMajorValue = CLBeaconMajorValue(truncating: beaconData.majorId)
         let minor : CLBeaconMinorValue = CLBeaconMinorValue(truncating: beaconData.minorId)
         let beaconID = beaconData.identifier
         
-        let region = CLBeaconRegion(proximityUUID: proximityUUID!,
-                                    major: major, minor: minor, identifier: beaconID)
+        let beaconConstraint = CLBeaconIdentityConstraint(
+            uuid: proximityUUID,
+            major: major,
+            minor: minor
+        )
+
+        let region = CLBeaconRegion(
+            beaconIdentityConstraint: beaconConstraint,
+            identifier: beaconID
+        )
         
         peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
         beaconPeripheralData = region.peripheralData(withMeasuredPower: beaconData.transmissionPower)
