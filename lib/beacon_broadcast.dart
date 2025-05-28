@@ -23,6 +23,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 class BeaconBroadcast {
+  static const String IBEACON_LAYOUT =
+      'm:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24';
   static const String ALTBEACON_LAYOUT =
       'm:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25';
   static const String EDDYSTONE_TLM_LAYOUT =
