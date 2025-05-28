@@ -45,11 +45,11 @@ class _MyAppState extends State<MyApp> {
       extraData: [100],
     ),
     'Eddystone UID': BeaconConfig(
-      uuid: '10c48f75868d55aabbff', // Eddystone Service UUID
-      majorId: 0xAABB,
-      minorId: 0,
+      uuid: '20c48f75868d55aabb6e', // Eddystone Service UUID
+      majorId: 0x2a02,
+      minorId: 0x1a01,
       transmissionPower: -59,
-      identifier: '07e11a024a41',
+      identifier: '02e11a024a11',
       advertiseMode: AdvertiseMode.lowPower,
       layout: BeaconBroadcast.EDDYSTONE_UID_LAYOUT,
     ),
@@ -58,8 +58,13 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-
     _initializeBeacon();
+  }
+
+  @override
+  void dispose() {
+    _isAdvertisingSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -274,12 +279,6 @@ class _MyAppState extends State<MyApp> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _isAdvertisingSubscription?.cancel();
-    super.dispose();
   }
 
   Future<void> _initializeBeacon() async {

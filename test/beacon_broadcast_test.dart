@@ -10,34 +10,42 @@ void main() {
   );
 
   void onStartMethodReturn(Future value) {
-    methodChannel.setMockMethodCallHandler((MethodCall methodCall) async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(methodChannel, (MethodCall methodCall) async {
       if (methodCall.method == 'start') {
         return value;
       }
+      return null;
     });
   }
 
   void onStopMethodReturn(Future value) {
-    methodChannel.setMockMethodCallHandler((MethodCall methodCall) async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(methodChannel, (MethodCall methodCall) async {
       if (methodCall.method == 'stop') {
         return value;
       }
+      return null;
     });
   }
 
   void onIsAdvertisingMethodReturn(Future value) {
-    methodChannel.setMockMethodCallHandler((MethodCall methodCall) async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(methodChannel, (MethodCall methodCall) async {
       if (methodCall.method == 'isAdvertising') {
         return value;
       }
+      return null;
     });
   }
 
   void onIsTransmissionSupportedMethodReturn(Future value) {
-    methodChannel.setMockMethodCallHandler((MethodCall methodCall) async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(methodChannel, (MethodCall methodCall) async {
       if (methodCall.method == 'isTransmissionSupported') {
         return value;
       }
+      return null;
     });
   }
 
