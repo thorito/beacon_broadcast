@@ -43,5 +43,32 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+    <key>NSLocationUsageDescription</key>
+    <string>This app requires continuous location access to detect Bluetooth beacons.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>This app needs location access to detect Bluetooth beacons.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>This app needs location access to detect Bluetooth beacons in the background.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>This app requires continuous location access to detect Bluetooth beacons in the background.</string>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>This app uses Bluetooth to detect nearby beacons.</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>This app uses Bluetooth to detect nearby beacons.</string>
+	<key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+        <string>bluetooth-central</string>
+        <string>bluetooth-peripheral</string>
+    </array>
+    <key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>bluetooth-le</string>
+        <string>location-services</string>
+    </array>
 </dict>
 </plist>

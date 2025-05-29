@@ -33,8 +33,12 @@ class Beacon {
 
     val beacon = Beacon.Builder().apply {
       setId1(beaconData.uuid)
-      beaconData.majorId?.let { setId2(it.toString()) }
-      beaconData.minorId?.let { setId3(it.toString()) }
+      if (beaconData.layout == BeaconParser.EDDYSTONE_UID_LAYOUT) {
+        setId2(beaconData.identifier)
+      } else {
+        beaconData.majorId?.let { setId2(it.toString()) }
+        beaconData.minorId?.let { setId3(it.toString()) }
+      }
       setTxPower(beaconData.transmissionPower ?: -59)
       setDataFields(beaconData.extraData?.map { it.toLong() } ?: listOf(0L))
       setManufacturer(beaconData.manufacturerId ?: RADIUS_NETWORK_MANUFACTURER)

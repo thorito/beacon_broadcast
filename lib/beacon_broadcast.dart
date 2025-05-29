@@ -20,7 +20,11 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+
+import 'beacon_broadcast_permission_result.dart';
+import 'beacon_broadcast_permission_status.dart';
 
 class BeaconBroadcast {
   static const String IBEACON_LAYOUT =
@@ -172,6 +176,101 @@ class BeaconBroadcast {
     }
     _extraData = extraData;
     return this;
+  }
+
+  /// Checks the current status of beacon broadcast permission
+  /// Returns a [BeaconBroadcastPermissionResult] with the status of each permission:
+  /// - Location (Always/WhenInUse/Denied/etc.)
+  /// - Bluetooth general state
+  /// - Bluetooth Connect permission
+  /// - Bluetooth Advertise permission
+  Future<BeaconBroadcastPermissionResult> checkPermissionStatus() async {
+    try {
+      final result = await _methodChannel.invokeMethod('checkPermissionStatus');
+      if (result is String) {
+        final status = _parsePermissionStatus(result);
+        return BeaconBroadcastPermissionResult(
+          location: status,
+          bluetooth: status,
+          bluetoothConnect: status,
+          bluetoothAdvertise: status,
+        );
+      }
+
+      if (result is Map) {
+        final map = Map<String, dynamic>.from(result);
+        return BeaconBroadcastPermissionResult(
+          location: _parsePermissionStatus(map['location'] ?? 'NOT_DETERMINED'),
+          bluetooth:
+              _parsePermissionStatus(map['bluetooth'] ?? 'NOT_DETERMINED'),
+          bluetoothConnect: _parsePermissionStatus(
+              map['bluetoothConnect'] ?? 'NOT_DETERMINED'),
+          bluetoothAdvertise: _parsePermissionStatus(
+              map['bluetoothAdvertise'] ?? 'NOT_DETERMINED'),
+        );
+      }
+
+      // Fallback
+      return BeaconBroadcastPermissionResult(
+        location: BeaconBroadcastPermissionStatus.notDetermined,
+        bluetooth: BeaconBroadcastPermissionStatus.notDetermined,
+        bluetoothConnect: BeaconBroadcastPermissionStatus.notDetermined,
+        bluetoothAdvertise: BeaconBroadcastPermissionStatus.notDetermined,
+      );
+    } on PlatformException catch (e) {
+      if (kDebugMode) {
+        print('Error checking permission status: ${e.message}');
+      }
+
+      return BeaconBroadcastPermissionResult(
+        location: BeaconBroadcastPermissionStatus.notDetermined,
+        bluetooth: BeaconBroadcastPermissionStatus.notDetermined,
+        bluetoothConnect: BeaconBroadcastPermissionStatus.notDetermined,
+        bluetoothAdvertise: BeaconBroadcastPermissionStatus.notDetermined,
+      );
+    }
+  }
+
+  BeaconBroadcastPermissionStatus _parsePermissionStatus(String status) {
+    switch (status) {
+      case 'AUTHORIZED':
+        return BeaconBroadcastPermissionStatus.authorized;
+      case 'AUTHORIZED_ALWAYS':
+        return BeaconBroadcastPermissionStatus.authorizedAlways;
+      case 'AUTHORIZED_WHEN_IN_USE':
+        return BeaconBroadcastPermissionStatus.authorizedWhenInUse;
+      case 'DENIED':
+        return BeaconBroadcastPermissionStatus.denied;
+      case 'RESTRICTED':
+        return BeaconBroadcastPermissionStatus.restricted;
+      case 'PERMANENTLY_DENIED':
+        return BeaconBroadcastPermissionStatus.permanentlyDenied;
+      case 'POWERED_OFF':
+        return BeaconBroadcastPermissionStatus.poweredOff;
+      case 'UNSUPPORTED':
+        return BeaconBroadcastPermissionStatus.unsupported;
+      case 'UNKNOWN':
+        return BeaconBroadcastPermissionStatus.unknown;
+      case 'RESETTING':
+        return BeaconBroadcastPermissionStatus.resetting;
+      case 'NOT_DETERMINED':
+      default:
+        return BeaconBroadcastPermissionStatus.notDetermined;
+    }
+  }
+
+  /// Requests permissions for beacon broadcast
+  Future<bool> requestPermissions() async {
+    try {
+      final bool? result =
+          await _methodChannel.invokeMethod('requestPermissions');
+      return result ?? false;
+    } on PlatformException catch (e) {
+      if (kDebugMode) {
+        print('Error requesting permissions: ${e.message}');
+      }
+      return false;
+    }
   }
 
   /// Starts beacon advertising.

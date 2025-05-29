@@ -2,21 +2,27 @@ PODS:
   - beacon_broadcast (0.0.1):
     - Flutter
   - Flutter (1.0.0)
+  - permission_handler_apple (9.3.0):
+    - Flutter
 
 DEPENDENCIES:
   - beacon_broadcast (from `.symlinks/plugins/beacon_broadcast/ios`)
-  - Flutter (from `.symlinks/flutter/ios`)
+  - Flutter (from `Flutter`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
 
 EXTERNAL SOURCES:
   beacon_broadcast:
     :path: ".symlinks/plugins/beacon_broadcast/ios"
   Flutter:
-    :path: ".symlinks/flutter/ios"
+    :path: Flutter
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
 
 SPEC CHECKSUMS:
-  beacon_broadcast: 10229b555c6d12bb984dc5cc5d1dfecd2c09c838
-  Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
+  beacon_broadcast: 1a794bd2561fdf593876f825e27ae50fb7bd5020
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
 
-PODFILE CHECKSUM: ebd43b443038e611b86ede96e613bd6033c49497
+PODFILE CHECKSUM: cc1f88378b4bfcf93a6ce00d2c587857c6008d3b
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.16.2
