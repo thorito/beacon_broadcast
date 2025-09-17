@@ -1,6 +1,6 @@
 name: beacon_broadcast_example
 description: Demonstrates how to use the beacon_broadcast plugin.
-version: 0.3.3
+version: 0.3.4
 publish_to: 'none'
 
 environment:
@@ -8,15 +8,14 @@ environment:
   flutter: '>=3.24.5'
 
 dependencies:
+  beacon_broadcast:
+    path: ../
   flutter:
     sdk: flutter
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  beacon_broadcast:
-    path: ../
 
 flutter:
   uses-material-design: true

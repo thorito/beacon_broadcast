@@ -11,7 +11,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  static const String uuid = '39ED98FF-2900-441A-802F-9C398FC199D2';
+  // UUID can be provided with or without hyphens
+  // Both formats are valid and will be automatically formatted:
+  // With hyphens: 'DA123456-7899-8765-4da8-97da654da987'
+  // Without hyphens: 'DA123456789987654da897da654da987'
+  static const String uuid =
+      'DA123456789987654da897da654da987'; // Without hyphens example
   static const int majorId = 1;
   static const int minorId = 100;
   static const int transmissionPower = -59;
@@ -53,65 +58,96 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Beacon Broadcast'),
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text('Is transmission supported?',
-                    style: Theme.of(context).textTheme.bodyMedium),
-                Text('$_isTransmissionSupported',
-                    style: Theme.of(context).textTheme.bodySmall),
-                Container(height: 16.0),
-                Text('Has beacon started?',
-                    style: Theme.of(context).textTheme.bodyMedium),
-                Text('$_isAdvertising',
-                    style: Theme.of(context).textTheme.bodySmall),
-                Container(height: 16.0),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      beaconBroadcast
-                          .setUUID(uuid)
-                          .setMajorId(majorId)
-                          .setMinorId(minorId)
-                          .setTransmissionPower(transmissionPower)
-                          .setAdvertiseMode(advertiseMode)
-                          .setIdentifier(identifier)
-                          .setLayout(layout)
-                          .setManufacturerId(manufacturerId)
-                          .setExtraData(extraData)
-                          .start();
-                    },
-                    child: Text('START'),
+        body: Builder(
+            builder: (scaffoldContext) => SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text('Is transmission supported?',
+                            style:
+                                Theme.of(scaffoldContext).textTheme.bodyMedium),
+                        Text('$_isTransmissionSupported',
+                            style:
+                                Theme.of(scaffoldContext).textTheme.bodySmall),
+                        Container(height: 16.0),
+                        Text('Has beacon started?',
+                            style:
+                                Theme.of(scaffoldContext).textTheme.bodyMedium),
+                        Text('$_isAdvertising',
+                            style:
+                                Theme.of(scaffoldContext).textTheme.bodySmall),
+                        Container(height: 16.0),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              try {
+                                await beaconBroadcast
+                                    .setUUID(uuid)
+                                    .setMajorId(majorId)
+                                    .setMinorId(minorId)
+                                    .setTransmissionPower(transmissionPower)
+                                    .setAdvertiseMode(advertiseMode)
+                                    .setIdentifier(identifier)
+                                    .setLayout(layout)
+                                    .setManufacturerId(manufacturerId)
+                                    .setExtraData(extraData)
+                                    .start();
+
+                                if (scaffoldContext.mounted) {
+                                  ScaffoldMessenger.of(scaffoldContext)
+                                      .showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Beacon broadcast started successfully'),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                }
+                              } catch (e) {
+                                if (scaffoldContext.mounted) {
+                                  ScaffoldMessenger.of(scaffoldContext)
+                                      .showSnackBar(
+                                    SnackBar(
+                                      content: Text('Error: ${e.toString()}'),
+                                      backgroundColor: Colors.red,
+                                      duration: const Duration(seconds: 5),
+                                    ),
+                                  );
+                                }
+                                print('Error starting beacon: $e');
+                              }
+                            },
+                            child: Text('START'),
+                          ),
+                        ),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              beaconBroadcast.stop();
+                            },
+                            child: Text('STOP'),
+                          ),
+                        ),
+                        Text('Beacon Data',
+                            style:
+                                Theme.of(scaffoldContext).textTheme.bodySmall),
+                        Text('UUID: $uuid'),
+                        Text('Major id: $majorId'),
+                        Text('Minor id: $minorId'),
+                        Text('Tx Power: $transmissionPower'),
+                        Text('Advertise Mode Value: $advertiseMode'),
+                        Text('Identifier: $identifier'),
+                        Text('Layout: $layout'),
+                        Text('Manufacturer Id: $manufacturerId'),
+                        Text('Extra data: $extraData'),
+                      ],
+                    ),
                   ),
-                ),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      beaconBroadcast.stop();
-                    },
-                    child: Text('STOP'),
-                  ),
-                ),
-                Text('Beacon Data',
-                    style: Theme.of(context).textTheme.bodySmall),
-                Text('UUID: $uuid'),
-                Text('Major id: $majorId'),
-                Text('Minor id: $minorId'),
-                Text('Tx Power: $transmissionPower'),
-                Text('Advertise Mode Value: $advertiseMode'),
-                Text('Identifier: $identifier'),
-                Text('Layout: $layout'),
-                Text('Manufacturer Id: $manufacturerId'),
-                Text('Extra data: $extraData'),
-              ],
-            ),
-          ),
-        ),
+                )),
       ),
     );
   }

@@ -53,10 +53,28 @@ class BeaconBroadcast {
   /// Sets UUID for beacon.
   ///
   /// [uuid] is random string identifier, e.g. "2f234454-cf6d-4a0f-adf2-f4911ba9ffa6"
+  /// Can be provided with or without hyphens
   ///
   /// This parameter is required for the default layout
   BeaconBroadcast setUUID(String uuid) {
-    _uuid = uuid;
+    // Remove any existing hyphens and convert to uppercase
+    String cleanUuid = uuid.replaceAll('-', '').toUpperCase();
+
+    // Validate length (32 hex characters)
+    if (cleanUuid.length != 32) {
+      throw IllegalArgumentException(
+          "Invalid UUID length! UUID must be 32 hexadecimal characters (got ${cleanUuid.length}). "
+          "Valid formats: '2f234454-cf6d-4a0f-adf2-f4911ba9ffa6' or '2f234454cf6d4a0fadf2f4911ba9ffa6'");
+    }
+
+    // Validate hex characters
+    if (!_isValidHexString(cleanUuid)) {
+      throw IllegalArgumentException(
+          "Invalid UUID! UUID must contain only hexadecimal characters (0-9, A-F)");
+    }
+
+    // Format UUID with hyphens: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+    _uuid = _formatUUID(cleanUuid);
     return this;
   }
 
@@ -66,6 +84,10 @@ class BeaconBroadcast {
   ///
   /// This parameter is required for the default layout
   BeaconBroadcast setMajorId(int majorId) {
+    if (majorId < 0 || majorId > 65535) {
+      throw IllegalArgumentException(
+          "Invalid majorId! Value must be between 0 and 65535, got: $majorId");
+    }
     _majorId = majorId;
     return this;
   }
@@ -76,6 +98,10 @@ class BeaconBroadcast {
   ///
   /// This parameter is required for the default layout
   BeaconBroadcast setMinorId(int minorId) {
+    if (minorId < 0 || minorId > 65535) {
+      throw IllegalArgumentException(
+          "Invalid minorId! Value must be between 0 and 65535, got: $minorId");
+    }
     _minorId = minorId;
     return this;
   }
@@ -88,6 +114,10 @@ class BeaconBroadcast {
   ///
   /// This parameter is optional
   BeaconBroadcast setIdentifier(String identifier) {
+    if (identifier.isEmpty) {
+      throw IllegalArgumentException(
+          "Invalid identifier! Identifier cannot be empty");
+    }
     _identifier = identifier;
     return this;
   }
@@ -101,6 +131,10 @@ class BeaconBroadcast {
   /// iOS the default received signal strength indicator (RSSI) value associated with the iOS device
   /// (see this article for more: [Turning an iOS Device into an iBeacon](https://developer.apple.com/documentation/corelocation/turning_an_ios_device_into_an_ibeacon)
   BeaconBroadcast setTransmissionPower(int transmissionPower) {
+    if (transmissionPower < -127 || transmissionPower > 1) {
+      throw IllegalArgumentException(
+          "Invalid transmissionPower! Value must be between -127 and 1 dBm, got: $transmissionPower");
+    }
     _transmissionPower = transmissionPower;
     return this;
   }
@@ -135,6 +169,9 @@ class BeaconBroadcast {
   ///
   /// **For iOS**, layout will be always iBeacon.
   BeaconBroadcast setLayout(String layout) {
+    if (layout.isEmpty) {
+      throw IllegalArgumentException("Invalid layout! Layout cannot be empty");
+    }
     _layout = layout;
     return this;
   }
@@ -146,6 +183,10 @@ class BeaconBroadcast {
   ///
   /// **For iOS**, the manufacturer will be always Apple.
   BeaconBroadcast setManufacturerId(int manufacturerId) {
+    if (manufacturerId < 0 || manufacturerId > 65535) {
+      throw IllegalArgumentException(
+          "Invalid manufacturerId! Value must be between 0 and 65535, got: $manufacturerId");
+    }
     _manufacturerId = manufacturerId;
     return this;
   }
@@ -304,4 +345,19 @@ int? _advertiseModeToInt(AdvertiseMode advMode) {
   return _intToAdvertiseMode.entries
       .firstWhere((element) => element.value == advMode)
       .key;
+}
+
+/// Validates that a string contains only hexadecimal characters
+bool _isValidHexString(String str) {
+  final hexRegExp = RegExp(r'^[0-9A-F]+$');
+  return hexRegExp.hasMatch(str);
+}
+
+/// Formats a 32-character hex string into UUID format with hyphens
+String _formatUUID(String cleanUuid) {
+  return '${cleanUuid.substring(0, 8)}-'
+      '${cleanUuid.substring(8, 12)}-'
+      '${cleanUuid.substring(12, 16)}-'
+      '${cleanUuid.substring(16, 20)}-'
+      '${cleanUuid.substring(20, 32)}';
 }

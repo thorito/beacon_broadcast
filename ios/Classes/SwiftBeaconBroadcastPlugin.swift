@@ -54,14 +54,33 @@ public class SwiftBeaconBroadcastPlugin: NSObject, FlutterPlugin, FlutterStreamH
     }
     
     private func startBeacon(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) {
-        var map = call.arguments as? Dictionary<String, Any>
+        guard let map = call.arguments as? Dictionary<String, Any> else {
+            result(FlutterError(code: "INVALID_ARGUMENTS", message: "Invalid arguments", details: nil))
+            return
+        }
+
+        guard let uuid = map["uuid"] as? String,
+              let majorId = map["majorId"] as? NSNumber,
+              let minorId = map["minorId"] as? NSNumber,
+              let identifier = map["identifier"] as? String else {
+            result(FlutterError(code: "MISSING_ARGUMENTS", message: "Missing required arguments", details: nil))
+            return
+        }
+
         let beaconData = BeaconData(
-            uuid: map?["uuid"] as! String,
-            majorId: map?["majorId"] as! NSNumber,
-            minorId: map?["minorId"] as! NSNumber,
-            transmissionPower: map?["transmissionPower"] as? NSNumber,
-            identifier: map?["identifier"] as! String
+            uuid: uuid,
+            majorId: majorId,
+            minorId: minorId,
+            transmissionPower: map["transmissionPower"] as? NSNumber,
+            identifier: identifier
         )
+
+        // Validate UUID format
+        guard UUID(uuidString: uuid) != nil else {
+            result(FlutterError(code: "INVALID_UUID", message: "UUID invalid: \(uuid)", details: nil))
+            return
+        }
+        
         beacon.start(beaconData: beaconData)
         result(nil)
     }

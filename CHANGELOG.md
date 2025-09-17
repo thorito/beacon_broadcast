@@ -1,3 +1,7 @@
+## 0.3.4
+Updated dependencies
+Check values on start.
+
 ## 0.3.3
 Updated dependencies
 
