@@ -49,6 +49,7 @@ class BeaconBroadcastPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
         val arguments = call.arguments as Map<String, Any>
         val beaconData = BeaconData(
                 arguments["uuid"] as String,
+                arguments["identifier"] as String?,
                 arguments["majorId"] as Int?,
                 arguments["minorId"] as Int?,
                 arguments["transmissionPower"] as Int?,
@@ -88,6 +89,7 @@ class BeaconBroadcastPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Str
 
 data class BeaconData(
         val uuid: String,
+        val identifier: String?,
         val majorId: Int?,
         val minorId: Int?,
         val transmissionPower: Int?,
