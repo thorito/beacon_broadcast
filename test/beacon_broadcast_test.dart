@@ -55,7 +55,7 @@ void main() {
 
       expect(
           () => BeaconBroadcast()
-              .setUUID("uuid")
+              .setUUID("uuid", false)
               .setMajorId(1)
               .setMinorId(1)
               .setTransmissionPower(-59)
@@ -83,7 +83,7 @@ void main() {
       onStartMethodReturn(Future.value());
       expect(
           () => BeaconBroadcast()
-              .setUUID("uuid")
+              .setUUID("uuid", false)
               .setMinorId(1)
               .setTransmissionPower(-59)
               .setIdentifier("identifier")
@@ -95,7 +95,7 @@ void main() {
       onStartMethodReturn(Future.value());
       expect(
           () => BeaconBroadcast()
-              .setUUID("uuid")
+              .setUUID("uuid", false)
               .setMajorId(1)
               .setTransmissionPower(-59)
               .setIdentifier("identifier")
@@ -108,7 +108,7 @@ void main() {
       onStartMethodReturn(Future.value());
       expect(
           () => BeaconBroadcast()
-              .setUUID("uuid")
+              .setUUID("uuid", false)
               .setMajorId(1)
               .setMinorId(1)
               .start(),
@@ -119,7 +119,9 @@ void main() {
         () async {
       onStartMethodReturn(Future.value());
       expect(
-          () => BeaconBroadcast().setUUID("uuid").setExtraData([270]).start(),
+          () => BeaconBroadcast()
+              .setUUID("uuid", false)
+              .setExtraData([270]).start(),
           throwsA(isA<IllegalArgumentException>()));
     });
 
@@ -128,7 +130,7 @@ void main() {
         onStartMethodReturn(Future.value());
         expect(
             () => BeaconBroadcast()
-                .setUUID("uuid")
+                .setUUID("uuid", false)
                 .setMajorId(1)
                 .setTransmissionPower(-59)
                 .setIdentifier("identifier")
@@ -141,7 +143,7 @@ void main() {
         onStartMethodReturn(Future.value());
         expect(
             () => BeaconBroadcast()
-                .setUUID("uuid")
+                .setUUID("uuid", false)
                 .setMinorId(1)
                 .setTransmissionPower(-59)
                 .setIdentifier("identifier")

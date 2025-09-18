@@ -62,21 +62,33 @@ class BeaconBroadcast {
   /// Can be provided with or without hyphens
   ///
   /// This parameter is required for the default layout
-  BeaconBroadcast setUUID(String uuid) {
+  BeaconBroadcast setUUID(String uuid, bool isEddystone) {
     // Remove any existing hyphens and convert to uppercase
     String cleanUuid = uuid.replaceAll('-', '').toUpperCase();
 
     // Validate length (32 hex characters)
     if (cleanUuid.length != 32) {
-      throw IllegalArgumentException(
-          "Invalid UUID length! UUID must be 32 hexadecimal characters (got ${cleanUuid.length}). "
-          "Valid formats: '2f234454-cf6d-4a0f-adf2-f4911ba9ffa6' or '2f234454cf6d4a0fadf2f4911ba9ffa6'");
+      if (!isEddystone) {
+        throw IllegalArgumentException(
+            "Invalid UUID length! UUID must be 32 hexadecimal characters (got ${cleanUuid.length}). "
+            "Valid formats: '2f234454-cf6d-4a0f-adf2-f4911ba9ffa6' or '2f234454cf6d4a0fadf2f4911ba9ffa6'");
+      } else {
+        throw IllegalArgumentException(
+            "Invalid Namespace length! Namespace must be 20 hexadecimal characters "
+            "and Instance must be 12 hexadecimal characters (got ${cleanUuid.length}). "
+            "Valid formats: '12345678901234567890123456789012'");
+      }
     }
 
     // Validate hex characters
     if (!_isValidHexString(cleanUuid)) {
-      throw IllegalArgumentException(
-          "Invalid UUID! UUID must contain only hexadecimal characters (0-9, A-F)");
+      if (!isEddystone) {
+        throw IllegalArgumentException(
+            "Invalid UUID! UUID must contain only hexadecimal characters (0-9, A-F)");
+      } else {
+        throw IllegalArgumentException(
+            "Invalid Namespace or Instance! Must contain only hexadecimal characters (0-9, A-F)");
+      }
     }
 
     // Format UUID with hyphens: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX

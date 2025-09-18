@@ -85,8 +85,15 @@ class _MyAppState extends State<MyApp> {
                           child: ElevatedButton(
                             onPressed: () async {
                               try {
+                                final isEddystone = layout ==
+                                        BeaconBroadcast.EDDYSTONE_TLM_LAYOUT ||
+                                    layout ==
+                                        BeaconBroadcast.EDDYSTONE_UID_LAYOUT ||
+                                    layout ==
+                                        BeaconBroadcast.EDDYSTONE_URL_LAYOUT;
+
                                 await beaconBroadcast
-                                    .setUUID(uuid)
+                                    .setUUID(uuid, isEddystone)
                                     .setMajorId(majorId)
                                     .setMinorId(minorId)
                                     .setTransmissionPower(transmissionPower)
