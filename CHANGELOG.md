@@ -1,3 +1,11 @@
+## 0.3.5
+- Android: Updated to Gradle 8.14, AGP 8.11.1, Kotlin 2.2.20 (built-in), compileSdk 35, minSdk 24
+- iOS: Migrated from CocoaPods to Swift Package Manager (SPM)
+- iOS: Added UIScene lifecycle support
+- iOS: Added Bluetooth and Location usage descriptions to Info.plist
+- Example: Added platform-aware permission handling (permission_handler on Android, Info.plist on iOS)
+- Example: Improved UI with visual beacon status indicator and mutually exclusive START/STOP buttons
+
 ## 0.3.4
 Updated dependencies
 Check values on start.
