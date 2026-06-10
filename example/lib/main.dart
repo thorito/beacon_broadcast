@@ -1,9 +1,13 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:beacon_broadcast/beacon_broadcast.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(MyApp());
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -29,31 +33,49 @@ class _MyAppState extends State<MyApp> {
   BeaconBroadcast beaconBroadcast = BeaconBroadcast();
 
   bool _isAdvertising = false;
-  BeaconStatus? _isTransmissionSupported;
+  bool _isTransmissionSupported = true;
   StreamSubscription<bool>? _isAdvertisingSubscription;
 
   @override
   void initState() {
     super.initState();
-    beaconBroadcast
-        .checkTransmissionSupported()
-        .then((isTransmissionSupported) {
-      setState(() {
-        _isTransmissionSupported = isTransmissionSupported;
-      });
-    });
 
-    _isAdvertisingSubscription =
-        beaconBroadcast.getAdvertisingStateChange().listen((isAdvertising) {
-      setState(() {
-        _isAdvertising = isAdvertising;
+    try {
+      beaconBroadcast
+          .checkTransmissionSupported()
+          .then((isTransmissionSupported) {
+        setState(() {
+          _isTransmissionSupported = true;
+        });
       });
-    });
+    } catch (e) {
+      print('Error checking transmission support: $e');
+      setState(() {
+        _isTransmissionSupported = false;
+      });
+    }
+
+    if (!_isTransmissionSupported) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Beacon transmission unsupported on this device'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      _isAdvertisingSubscription =
+          beaconBroadcast.getAdvertisingStateChange().listen((isAdvertising) {
+            setState(() {
+              _isAdvertising = isAdvertising;
+            });
+          });
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Beacon Broadcast'),
@@ -65,80 +87,129 @@ class _MyAppState extends State<MyApp> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Text('Is transmission supported?',
-                            style:
-                                Theme.of(scaffoldContext).textTheme.bodyMedium),
-                        Text('$_isTransmissionSupported',
-                            style:
-                                Theme.of(scaffoldContext).textTheme.bodySmall),
-                        Container(height: 16.0),
-                        Text('Has beacon started?',
-                            style:
-                                Theme.of(scaffoldContext).textTheme.bodyMedium),
-                        Text('$_isAdvertising',
-                            style:
-                                Theme.of(scaffoldContext).textTheme.bodySmall),
-                        Container(height: 16.0),
-                        Center(
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              try {
-                                final isEddystone = layout ==
-                                        BeaconBroadcast.EDDYSTONE_TLM_LAYOUT ||
-                                    layout ==
-                                        BeaconBroadcast.EDDYSTONE_UID_LAYOUT ||
-                                    layout ==
-                                        BeaconBroadcast.EDDYSTONE_URL_LAYOUT;
-
-                                await beaconBroadcast
-                                    .setUUID(uuid, isEddystone)
-                                    .setMajorId(majorId)
-                                    .setMinorId(minorId)
-                                    .setTransmissionPower(transmissionPower)
-                                    .setAdvertiseMode(advertiseMode)
-                                    .setIdentifier(identifier)
-                                    .setLayout(layout)
-                                    .setManufacturerId(manufacturerId)
-                                    .setExtraData(extraData)
-                                    .start();
-
-                                if (scaffoldContext.mounted) {
-                                  ScaffoldMessenger.of(scaffoldContext)
-                                      .showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                          'Beacon broadcast started successfully'),
-                                      backgroundColor: Colors.green,
-                                    ),
-                                  );
-                                }
-                              } catch (e) {
-                                if (scaffoldContext.mounted) {
-                                  ScaffoldMessenger.of(scaffoldContext)
-                                      .showSnackBar(
-                                    SnackBar(
-                                      content: Text('Error: ${e.toString()}'),
-                                      backgroundColor: Colors.red,
-                                      duration: const Duration(seconds: 5),
-                                    ),
-                                  );
-                                }
-                                print('Error starting beacon: $e');
-                              }
-                            },
-                            child: Text('START'),
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _isAdvertising ? Colors.green : Colors.grey.shade300,
+                          ),
+                          child: Icon(
+                            _isAdvertising ? Icons.bluetooth_connected : Icons.bluetooth_disabled,
+                            size: 40,
+                            color: Colors.white,
                           ),
                         ),
-                        Center(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              beaconBroadcast.stop();
-                            },
-                            child: Text('STOP'),
+                        const SizedBox(height: 8),
+                        Text(
+                          _isAdvertising ? 'Broadcasting' : 'Idle',
+                          style: Theme.of(scaffoldContext).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: _isAdvertising ? Colors.green : Colors.grey,
                           ),
                         ),
+                        const SizedBox(height: 16),
+                        if (_isTransmissionSupported)
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: _isAdvertising
+                                  ? null
+                                  : () async {
+                                      if (Platform.isAndroid) {
+                                        final permissions = [
+                                          Permission.bluetoothAdvertise,
+                                          Permission.bluetoothConnect,
+                                          Permission.bluetoothScan,
+                                          Permission.locationWhenInUse,
+                                        ];
+                                        final statuses = await permissions.request();
+                                        final allGranted = statuses.values
+                                            .every((s) => s.isGranted);
+
+                                        if (!allGranted) {
+                                          if (scaffoldContext.mounted) {
+                                            ScaffoldMessenger.of(scaffoldContext)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                    'Permissions denied'),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                          }
+                                          return;
+                                        }
+                                      }
+
+                                      try {
+                                        final isEddystone = layout ==
+                                                BeaconBroadcast.EDDYSTONE_TLM_LAYOUT ||
+                                            layout ==
+                                                BeaconBroadcast.EDDYSTONE_UID_LAYOUT ||
+                                            layout ==
+                                                BeaconBroadcast.EDDYSTONE_URL_LAYOUT;
+
+                                        await beaconBroadcast
+                                            .setUUID(uuid, isEddystone)
+                                            .setMajorId(majorId)
+                                            .setMinorId(minorId)
+                                            .setTransmissionPower(transmissionPower)
+                                            .setAdvertiseMode(advertiseMode)
+                                            .setIdentifier(identifier)
+                                            .setLayout(layout)
+                                            .setManufacturerId(manufacturerId)
+                                            .setExtraData(extraData)
+                                            .start();
+                                      } catch (e) {
+                                        if (scaffoldContext.mounted) {
+                                          ScaffoldMessenger.of(scaffoldContext)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text('Error: ${e.toString()}'),
+                                              backgroundColor: Colors.red,
+                                              duration: const Duration(seconds: 5),
+                                            ),
+                                          );
+                                        }
+                                        print('Error starting beacon: $e');
+                                      }
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                foregroundColor: Colors.white,
+                                disabledBackgroundColor: Colors.grey.shade300,
+                                disabledForegroundColor: Colors.grey,
+                              ),
+                              child: const Text('START'),
+                            ),
+                            const SizedBox(width: 16),
+                            ElevatedButton(
+                              onPressed: _isAdvertising
+                                  ? () {
+                                      beaconBroadcast.stop();
+                                    }
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                disabledBackgroundColor: Colors.grey.shade300,
+                                disabledForegroundColor: Colors.grey,
+                              ),
+                              child: const Text('STOP'),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        const Divider(),
+                        Text('Beacon Data',
+                            style:
+                                Theme.of(scaffoldContext).textTheme.titleSmall),
+                        const SizedBox(height: 4),
                         Text('Beacon Data',
                             style:
                                 Theme.of(scaffoldContext).textTheme.bodySmall),
@@ -157,7 +228,6 @@ class _MyAppState extends State<MyApp> {
                 )),
       ),
     );
-  }
 
   @override
   void dispose() {
